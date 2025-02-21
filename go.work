@@ -1,0 +1,11 @@
+go 1.23.2
+
+use (
+	./agenda
+	./auth
+	./common
+	./gateway
+	./notification
+	./proffesional
+	./reservation
+)

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "github.com/lpsaldana/go-appointment-booking-microservices/common";
+
+package api;
+
+service AuthService {
+    rpc Login (LoginRequest) returns (User);
+}
+
+message User {
+    string ID = 1;
+    string Username = 2;
+    string Password = 3;
+}
+
+message LoginRequest {
+    string Username = 1;
+    string Password = 2;
+}

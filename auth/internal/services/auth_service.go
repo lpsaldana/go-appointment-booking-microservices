@@ -2,7 +2,10 @@ package services
 
 import (
 	"errors"
+	"log"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/models"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/repositories"
 	"github.com/lpsaldana/go-appointment-booking-microservices/common/api"
@@ -15,11 +18,12 @@ type AuthService interface {
 }
 
 type authServiceImpl struct {
-	Repo repositories.UserRepository
+	Repo      repositories.UserRepository
+	SecretKey []byte
 }
 
-func NewAuthService(repo repositories.UserRepository) AuthService {
-	return &authServiceImpl{Repo: repo}
+func NewAuthService(repo repositories.UserRepository, secretKey string) AuthService {
+	return &authServiceImpl{Repo: repo, SecretKey: []byte(secretKey)}
 }
 
 func (s *authServiceImpl) CreateUser(req *api.CreateUserRequest) (*api.CreateUserResponse, error) {
@@ -56,6 +60,7 @@ func (s *authServiceImpl) Login(req *api.LoginRequest) (*api.LoginResponse, erro
 		}, errors.New("user_not_found")
 	}
 
+	log.Println(user.Password, req.Password)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		return &api.LoginResponse{
 			Token:   "",
@@ -63,8 +68,23 @@ func (s *authServiceImpl) Login(req *api.LoginRequest) (*api.LoginResponse, erro
 		}, errors.New("incorrect_password")
 	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,                               // ID del usuario en el cuerpo
+		"exp":     time.Now().Add(24 * time.Hour).Unix(), // Expira en 24 horas
+		"iat":     time.Now().Unix(),                     // Issued At: tiempo de emisión
+	})
+
+	tokenString, err := token.SignedString(s.SecretKey)
+	if err != nil {
+		log.Printf("Error singning token: %v", err)
+		return &api.LoginResponse{
+			Token:   "",
+			Success: false,
+		}, errors.New("error_generating_token")
+	}
+
 	return &api.LoginResponse{
-		Token:   "yet to implement",
+		Token:   tokenString,
 		Success: true,
 	}, nil
 }

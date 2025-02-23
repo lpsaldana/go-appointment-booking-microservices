@@ -13,7 +13,8 @@ import (
 )
 
 func main() {
-	dsn := "host=localhost user=postgres password=yourpassword dbname=auth_db port=5432 sslmode=disable"
+	dsn := "host=localhost user=postgres password=postgres dbname=Auth port=5432 sslmode=disable"
+	secretKey := "please-dont-use-this-key-12345"
 	dbConfig := config.NewDBConfig(dsn)
 	db, err := dbConfig.ConnectDB()
 	if err != nil {
@@ -21,7 +22,7 @@ func main() {
 	}
 
 	repo := repositories.NewUserRepository(db)
-	srv := services.NewAuthService(repo)
+	srv := services.NewAuthService(repo, secretKey)
 	handler := handlers.NewAuthHandler(srv)
 
 	lis, err := net.Listen("tcp", ":50051")

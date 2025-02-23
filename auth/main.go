@@ -8,7 +8,7 @@ import (
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/handlers"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/repositories"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/services"
-	"github.com/lpsaldana/go-appointment-booking-microservices/common/api"
+	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 	"google.golang.org/grpc"
 )
 
@@ -31,7 +31,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	api.RegisterAuthServiceServer(grpcServer, handler)
+	pb.RegisterAuthServiceServer(grpcServer, handler)
 
 	log.Println("Auth server runing in port :50051...")
 	if err := grpcServer.Serve(lis); err != nil {

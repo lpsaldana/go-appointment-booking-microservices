@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/services"
-	"github.com/lpsaldana/go-appointment-booking-microservices/common/api"
+	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 )
 
 type AuthHandler struct {
-	api.UnimplementedAuthServiceServer
+	pb.UnimplementedAuthServiceServer
 	Service services.AuthService
 }
 
@@ -16,10 +16,10 @@ func NewAuthHandler(srv services.AuthService) *AuthHandler {
 	return &AuthHandler{Service: srv}
 }
 
-func (h *AuthHandler) CreateUser(ctx context.Context, req *api.CreateUserRequest) (*api.CreateUserResponse, error) {
+func (h *AuthHandler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	return h.Service.CreateUser(req)
 }
 
-func (h *AuthHandler) Login(ctx context.Context, req *api.LoginRequest) (*api.LoginResponse, error) {
+func (h *AuthHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	return h.Service.Login(req)
 }

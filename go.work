@@ -6,6 +6,6 @@ use (
 	./common
 	./gateway
 	./notification
-	./proffesional
+	./professional
 	./reservation
 )

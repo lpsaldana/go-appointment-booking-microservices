@@ -8,13 +8,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/models"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/repositories"
-	"github.com/lpsaldana/go-appointment-booking-microservices/common/api"
+	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
-	CreateUser(req *api.CreateUserRequest) (*api.CreateUserResponse, error)
-	Login(req *api.LoginRequest) (*api.LoginResponse, error)
+	CreateUser(req *pb.CreateUserRequest) (*pb.CreateUserResponse, error)
+	Login(req *pb.LoginRequest) (*pb.LoginResponse, error)
 }
 
 type authServiceImpl struct {
@@ -26,10 +26,10 @@ func NewAuthService(repo repositories.UserRepository, secretKey string) AuthServ
 	return &authServiceImpl{Repo: repo, SecretKey: []byte(secretKey)}
 }
 
-func (s *authServiceImpl) CreateUser(req *api.CreateUserRequest) (*api.CreateUserResponse, error) {
+func (s *authServiceImpl) CreateUser(req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	_, err := s.Repo.FindByUsername(req.Username)
 	if err == nil {
-		return &api.CreateUserResponse{
+		return &pb.CreateUserResponse{
 			Message: "Username is not available",
 			Success: false,
 		}, nil
@@ -44,17 +44,17 @@ func (s *authServiceImpl) CreateUser(req *api.CreateUserRequest) (*api.CreateUse
 		return nil, err
 	}
 
-	return &api.CreateUserResponse{
+	return &pb.CreateUserResponse{
 		Message: "User created",
 		Success: true,
 	}, nil
 }
 
-func (s *authServiceImpl) Login(req *api.LoginRequest) (*api.LoginResponse, error) {
+func (s *authServiceImpl) Login(req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	user, err := s.Repo.FindByUsername(req.Username)
 
 	if err != nil {
-		return &api.LoginResponse{
+		return &pb.LoginResponse{
 			Token:   "",
 			Success: false,
 		}, errors.New("user_not_found")
@@ -62,7 +62,7 @@ func (s *authServiceImpl) Login(req *api.LoginRequest) (*api.LoginResponse, erro
 
 	log.Println(user.Password, req.Password)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return &api.LoginResponse{
+		return &pb.LoginResponse{
 			Token:   "",
 			Success: false,
 		}, errors.New("incorrect_password")
@@ -77,13 +77,13 @@ func (s *authServiceImpl) Login(req *api.LoginRequest) (*api.LoginResponse, erro
 	tokenString, err := token.SignedString(s.SecretKey)
 	if err != nil {
 		log.Printf("Error singning token: %v", err)
-		return &api.LoginResponse{
+		return &pb.LoginResponse{
 			Token:   "",
 			Success: false,
 		}, errors.New("error_generating_token")
 	}
 
-	return &api.LoginResponse{
+	return &pb.LoginResponse{
 		Token:   tokenString,
 		Success: true,
 	}, nil

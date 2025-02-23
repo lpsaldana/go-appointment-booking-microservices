@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package = "github.com/lpsaldana/go-appointment-booking-microservices/common/pb";
+
+package pb;
+
+service ProfessionalService {
+    rpc CreateProfessional (CreateProfessionalRequest) returns (CreateProfessionalResponse);
+    rpc GetProfessional (GetProfessionalRequest) returns (GetProfessionalResponse);
+    rpc ListProfessionals (ListProfessionalsRequest) returns (ListProfessionalsResponse);
+  }
+  
+  message CreateProfessionalRequest {
+    string name = 1;
+    string profession = 2;
+    string contact = 3;
+  }
+  
+  message CreateProfessionalResponse {
+    string message = 1;
+    bool success = 2;
+    uint32 professional_id = 3;
+  }
+  
+  message GetProfessionalRequest {
+    uint32 id = 1;
+  }
+  
+  message Professional {
+    uint32 id = 1;
+    string name = 2;
+    string profession = 3;
+    string contact = 4;
+  }
+  
+  message GetProfessionalResponse {
+    Professional professional = 1;
+    bool success = 2;
+  }
+  
+  message ListProfessionalsRequest {}
+  
+  message ListProfessionalsResponse {
+    repeated Professional professionals = 1;
+    bool success = 2;
+  }

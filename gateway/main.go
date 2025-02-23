@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/lpsaldana/go-appointment-booking-microservices/common"
-	"github.com/lpsaldana/go-appointment-booking-microservices/common/api"
+	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 	"github.com/lpsaldana/go-appointment-booking-microservices/gateway/internal/handlers"
 )
 
@@ -25,7 +25,7 @@ func main() {
 		log.Fatalf("Cannot connect to auth service: %v", err)
 	}
 	defer conn.Close()
-	authClient := api.NewAuthServiceClient(conn)
+	authClient := pb.NewAuthServiceClient(conn)
 	handler := handlers.NewAuthHandler(authClient)
 	handler.RegisterAuthRoutes(mux)
 

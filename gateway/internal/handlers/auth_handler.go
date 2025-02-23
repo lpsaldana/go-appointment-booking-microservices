@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lpsaldana/go-appointment-booking-microservices/common/api"
+	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 	"github.com/lpsaldana/go-appointment-booking-microservices/gateway/internal/types"
 )
 
 type authHandler struct {
-	Client api.AuthServiceClient
+	Client pb.AuthServiceClient
 }
 
-func NewAuthHandler(client api.AuthServiceClient) *authHandler {
+func NewAuthHandler(client pb.AuthServiceClient) *authHandler {
 	return &authHandler{Client: client}
 }
 
@@ -38,7 +38,7 @@ func (h *authHandler) createUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
 	defer cancel()
 
-	resp, err := h.Client.CreateUser(ctx, &api.CreateUserRequest{
+	resp, err := h.Client.CreateUser(ctx, &pb.CreateUserRequest{
 		Username: req.Username,
 		Password: req.Password,
 	})
@@ -66,7 +66,7 @@ func (h *authHandler) login(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
 	defer cancel()
 
-	resp, err := h.Client.Login(ctx, &api.LoginRequest{
+	resp, err := h.Client.Login(ctx, &pb.LoginRequest{
 		Username: req.Username,
 		Password: req.Password,
 	})

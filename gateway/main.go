@@ -5,8 +5,11 @@ import (
 	"net/http"
 
 	_ "github.com/joho/godotenv/autoload"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/lpsaldana/go-appointment-booking-microservices/common"
+	"github.com/lpsaldana/go-appointment-booking-microservices/common/api"
 	"github.com/lpsaldana/go-appointment-booking-microservices/gateway/internal/handlers"
 )
 
@@ -16,8 +19,15 @@ var (
 
 func main() {
 	mux := http.NewServeMux()
-	handler := handlers.NewHandler()
-	handler.RegisterRoutes(mux)
+
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Cannot connect to auth service: %v", err)
+	}
+	defer conn.Close()
+	authClient := api.NewAuthServiceClient(conn)
+	handler := handlers.NewAuthHandler(authClient)
+	handler.RegisterAuthRoutes(mux)
 
 	log.Printf("Starting HTTP server at %s", httpAddr)
 

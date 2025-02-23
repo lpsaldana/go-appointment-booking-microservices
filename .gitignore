@@ -1,0 +1,47 @@
+# Archivos generados por Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Directorios de compilación y caché
+/bin/
+/pkg/
+/vendor/
+
+# Archivos de configuración local o sensibles
+*.env
+.env.local
+config.local.yaml
+secrets/
+
+# Archivos generados por el compilador de Protobuf
+proto/*.pb.go  # Si prefieres regenerarlos en cada build, aunque también puedes versionarlos
+
+# Logs y archivos temporales
+*.log
+*.log.*
+tmp/
+temp/
+
+# Archivos de sistema operativo
+.DS_Store  # macOS
+Thumbs.db  # Windows
+
+# Directorios de dependencias locales (si usas vendor/)
+vendor/
+
+# Archivos de editores o IDEs
+*.swp
+*.swo
+.vscode/
+.idea/
+*.iml
+
+# Archivos de pruebas o cobertura
+*.prof
+*.cover
+coverage.txt

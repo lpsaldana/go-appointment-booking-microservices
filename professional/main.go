@@ -21,7 +21,7 @@ func main() {
 	dbConfig := config.NewDBConfig(dsn)
 	db, err := dbConfig.ConnectDB()
 	if err != nil {
-		log.Fatalf("No se pudo inicializar la base de datos: %v", err)
+		log.Fatalf("Cannot connect to DB: %v", err)
 	}
 
 	repo := repositories.NewProfessionalRepository(db)
@@ -30,14 +30,14 @@ func main() {
 
 	lis, err := net.Listen("tcp", ":50052") // Puerto diferente a auth y tasks
 	if err != nil {
-		log.Fatalf("Error al escuchar en el puerto 50052: %v", err)
+		log.Fatalf("Error listening to port 50052: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterProfessionalServiceServer(grpcServer, handler)
 
-	log.Println("Servidor de profesionales corriendo en :50052...")
+	log.Println("Server runing on port :50052...")
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("Error al iniciar el servidor gRPC: %v", err)
+		log.Fatalf("Error starting gRPC server: %v", err)
 	}
 }

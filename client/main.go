@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	dsn = common.EnvString("AUTH_DB", "host=localhost user=postgres password=postgres dbname=clients port=5432 sslmode=disable")
+	dsn = common.EnvString("AUTH_DB", "host=localhost user=postgres password=postgres dbname=Clients port=5432 sslmode=disable")
 )
 
 func main() {

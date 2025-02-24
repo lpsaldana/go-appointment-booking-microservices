@@ -43,6 +43,15 @@ func main() {
 	profHandler := handlers.NewProfessionalHandler(profConn)
 	profHandler.RegisterProfessionalRoutes(mux, secretKey)
 
+	clientConn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Cannot connect to client service: %v", err)
+	}
+	defer clientConn.Close()
+
+	clientHandler := handlers.NewClientHandler(clientConn)
+	clientHandler.RegisterClientRoutes(mux, secretKey)
+
 	log.Printf("Starting HTTP server at %s", httpAddr)
 
 	if err := http.ListenAndServe(httpAddr, mux); err != nil {

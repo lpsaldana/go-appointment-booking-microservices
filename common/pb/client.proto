@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package = "github.com/lpsaldana/go-appointment-booking-microservices/common/pb";
+
+package pb;
+
+service ClientService {
+    rpc CreateClient (CreateClientRequest) returns (CreateClientResponse);
+    rpc GetClient (GetClientRequest) returns (GetClientResponse);
+    rpc ListClients (ListClientsRequest) returns (ListClientsResponse);
+}
+
+message CreateClientRequest {
+    string name = 1;
+    string email = 2;
+    string phone = 3;
+}
+
+message CreateClientResponse {
+    string message = 1;
+    bool success = 2;
+    uint32 client_id = 3;
+}
+
+message GetClientRequest {
+    uint32 id = 1;
+}
+
+message Client {
+    uint32 id = 1;
+    string name = 2;
+    string email = 3;
+    string phone = 4;
+}
+
+message GetClientResponse {
+    Client client = 1;
+    bool success = 2;
+}
+
+message ListClientsRequest {}
+
+message ListClientsResponse {
+    repeated Client clients = 1;
+    bool success = 2;
+}

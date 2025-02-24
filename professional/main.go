@@ -36,7 +36,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterProfessionalServiceServer(grpcServer, handler)
 
-	log.Println("Servidor de profesionales corriendo en :50053...")
+	log.Println("Servidor de profesionales corriendo en :50052...")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Error al iniciar el servidor gRPC: %v", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/lpsaldana/go-appointment-booking-microservices/common"
 	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 	"github.com/lpsaldana/go-appointment-booking-microservices/professional/internal/config"
 	"github.com/lpsaldana/go-appointment-booking-microservices/professional/internal/handlers"
@@ -12,8 +13,11 @@ import (
 	"google.golang.org/grpc"
 )
 
+var (
+	dsn = common.EnvString("AUTH_DB", "host=localhost user=postgres password=postgres dbname=Professionals port=5432 sslmode=disable")
+)
+
 func main() {
-	dsn := "host=localhost user=postgres password=postgres dbname=Professionals port=5432 sslmode=disable"
 	dbConfig := config.NewDBConfig(dsn)
 	db, err := dbConfig.ConnectDB()
 	if err != nil {

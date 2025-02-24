@@ -14,20 +14,34 @@ import (
 )
 
 var (
-	httpAddr = common.EnvString("HTTP_ADDR", ":3000")
+	httpAddr  = common.EnvString("HTTP_ADDR", ":3000")
+	secretKey = common.EnvString("JWT_SECRET", "please-dont-use-this-key-12345")
 )
 
 func main() {
+
 	mux := http.NewServeMux()
 
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//auth_server
+	authConn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Cannot connect to auth service: %v", err)
 	}
-	defer conn.Close()
-	authClient := pb.NewAuthServiceClient(conn)
-	handler := handlers.NewAuthHandler(authClient)
-	handler.RegisterAuthRoutes(mux)
+	defer authConn.Close()
+
+	authClient := pb.NewAuthServiceClient(authConn)
+	authHandler := handlers.NewAuthHandler(authClient)
+	authHandler.RegisterAuthRoutes(mux)
+
+	//professional_server
+	profConn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Cannot connect to profesional service: %v", err)
+	}
+	defer profConn.Close()
+
+	profHandler := handlers.NewProfessionalHandler(profConn)
+	profHandler.RegisterProfessionalRoutes(mux, secretKey)
 
 	log.Printf("Starting HTTP server at %s", httpAddr)
 

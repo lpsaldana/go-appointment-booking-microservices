@@ -24,13 +24,13 @@ func (h *authHandler) RegisterAuthRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/login", h.login)
 }
 
-func jsonDecode[T any](r *http.Request, dest *T) error {
+func JsonDecodeInternal[T any](r *http.Request, dest *T) error {
 	return json.NewDecoder(r.Body).Decode(dest)
 }
 
 func (h *authHandler) createUser(w http.ResponseWriter, r *http.Request) {
 	var req types.CreateUserRequest
-	if err := jsonDecode(r, &req); err != nil {
+	if err := JsonDecodeInternal(r, &req); err != nil {
 		http.Error(w, "Error decoding JSON", http.StatusBadRequest)
 		return
 	}
@@ -58,7 +58,7 @@ func (h *authHandler) createUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *authHandler) login(w http.ResponseWriter, r *http.Request) {
 	var req types.LoginRequest
-	if err := jsonDecode(r, &req); err != nil {
+	if err := JsonDecodeInternal(r, &req); err != nil {
 		http.Error(w, "Error decoding JSON", http.StatusBadRequest)
 		return
 	}

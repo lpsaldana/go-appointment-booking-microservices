@@ -60,7 +60,6 @@ func (s *authServiceImpl) Login(req *pb.LoginRequest) (*pb.LoginResponse, error)
 		}, errors.New("user_not_found")
 	}
 
-	log.Println(user.Password, req.Password)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		return &pb.LoginResponse{
 			Token:   "",

@@ -8,13 +8,17 @@ import (
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/handlers"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/repositories"
 	"github.com/lpsaldana/go-appointment-booking-microservices/auth/internal/services"
+	"github.com/lpsaldana/go-appointment-booking-microservices/common"
 	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 	"google.golang.org/grpc"
 )
 
+var (
+	secretKey = common.EnvString("JWT_SECRET", "please-dont-use-this-key-12345")
+	dsn       = common.EnvString("AUTH_DB", "host=localhost user=postgres password=postgres dbname=Auth port=5432 sslmode=disable")
+)
+
 func main() {
-	dsn := "host=localhost user=postgres password=postgres dbname=Auth port=5432 sslmode=disable"
-	secretKey := "please-dont-use-this-key-12345"
 	dbConfig := config.NewDBConfig(dsn)
 	db, err := dbConfig.ConnectDB()
 	if err != nil {

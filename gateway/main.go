@@ -43,6 +43,7 @@ func main() {
 	profHandler := handlers.NewProfessionalHandler(profConn)
 	profHandler.RegisterProfessionalRoutes(mux, secretKey)
 
+	//client_server
 	clientConn, err := grpc.NewClient("localhost:50053", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Cannot connect to client service: %v", err)
@@ -51,6 +52,15 @@ func main() {
 
 	clientHandler := handlers.NewClientHandler(clientConn)
 	clientHandler.RegisterClientRoutes(mux, secretKey)
+
+	//agenda_server
+	agendaConn, err := grpc.NewClient("localhost:50054", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Cannot connect to agenda service: %v", err)
+	}
+	defer agendaConn.Close()
+	agendaHandler := handlers.NewAgendaHandler(agendaConn)
+	agendaHandler.RegisterAgendaRoutes(mux, secretKey)
 
 	log.Printf("Starting HTTP server at %s", httpAddr)
 

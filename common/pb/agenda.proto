@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/lpsaldana/go-appointment-booking-microservices/common/pb";
+
+service AgendaService {
+  rpc CreateSlot (CreateSlotRequest) returns (CreateSlotResponse);
+  rpc ListAvailableSlots (ListAvailableSlotsRequest) returns (ListAvailableSlotsResponse);
+  rpc BookAppointment (BookAppointmentRequest) returns (BookAppointmentResponse);
+  rpc ListAppointments (ListAppointmentsRequest) returns (ListAppointmentsResponse);
+}
+
+message CreateSlotRequest {
+  uint32 professional_id = 1;
+  string start_time = 2;  // ISO 8601 format, ie: "2025-03-10T10:00:00Z"
+  string end_time = 3;    // ISO 8601 format, ie: "2025-03-10T10:30:00Z"
+}
+
+message CreateSlotResponse {
+  string message = 1;
+  bool success = 2;
+  uint32 slot_id = 3;
+}
+
+message ListAvailableSlotsRequest {
+  uint32 professional_id = 1;
+  string date = 2;  // "YYYY-MM-DD" format, ie: "2025-03-10"
+}
+
+message Slot {
+  uint32 id = 1;
+  uint32 professional_id = 2;
+  string start_time = 3;
+  string end_time = 4;
+  bool available = 5;
+}
+
+message ListAvailableSlotsResponse {
+  repeated Slot slots = 1;
+  bool success = 2;
+}
+
+message BookAppointmentRequest {
+  uint32 client_id = 1;
+  uint32 slot_id = 2;
+}
+
+message BookAppointmentResponse {
+  string message = 1;
+  bool success = 2;
+  uint32 appointment_id = 3;
+}
+
+message ListAppointmentsRequest {
+  uint32 client_id = 1;    // sorts by client (optional)
+  uint32 professional_id = 2;  // sorts by professional (optional)
+}
+
+message Appointment {
+  uint32 id = 1;
+  uint32 client_id = 2;
+  uint32 slot_id = 3;
+  string start_time = 4;
+  string end_time = 5;
+  uint32 professional_id = 6;
+}
+
+message ListAppointmentsResponse {
+  repeated Appointment appointments = 1;
+  bool success = 2;
+}

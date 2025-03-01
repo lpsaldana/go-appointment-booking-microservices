@@ -1,11 +1,14 @@
 package services
 
 import (
+	"context"
+	"log"
 	"time"
 
 	"github.com/lpsaldana/go-appointment-booking-microservices/agenda/internal/models"
 	"github.com/lpsaldana/go-appointment-booking-microservices/agenda/internal/repositories"
 	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
+	"google.golang.org/grpc"
 )
 
 type AgendaService interface {
@@ -16,11 +19,13 @@ type AgendaService interface {
 }
 
 type agendaServiceImpl struct {
-	Repo repositories.AgendaRepository
+	Repo        repositories.AgendaRepository
+	NotifClient pb.NotificationServiceClient
 }
 
-func NewAgendaService(repo repositories.AgendaRepository) AgendaService {
-	return &agendaServiceImpl{Repo: repo}
+func NewAgendaService(repo repositories.AgendaRepository, notifConn *grpc.ClientConn) AgendaService {
+	return &agendaServiceImpl{Repo: repo,
+		NotifClient: pb.NewNotificationServiceClient(notifConn)}
 }
 
 func (s *agendaServiceImpl) CreateSlot(req *pb.CreateSlotRequest) (*pb.CreateSlotResponse, error) {
@@ -102,6 +107,17 @@ func (s *agendaServiceImpl) BookAppointment(req *pb.BookAppointmentRequest) (*pb
 		return &pb.BookAppointmentResponse{Message: "Error updating slot", Success: false}, err
 	}
 
+	_, err = s.NotifClient.SendAppointmentNotification(context.TODO(), &pb.SendAppointmentNotificationRequest{
+		ClientId:       req.ClientId,
+		ProfessionalId: uint32(slot.ProfessionalID),
+		AppointmentId:  uint32(appointment.ID),
+		StartTime:      slot.StartTime.Format(time.RFC3339),
+		EndTime:        slot.EndTime.Format(time.RFC3339),
+	})
+	if err != nil {
+		log.Printf("Error sending notification: %v", err)
+	}
+
 	return &pb.BookAppointmentResponse{
 		Message:       "Appointment successfully generated",
 		Success:       true,
@@ -117,7 +133,6 @@ func (s *agendaServiceImpl) ListAppointments(req *pb.ListAppointmentsRequest) (*
 
 	pbAppointments := make([]*pb.Appointment, len(appointments))
 	for i, appt := range appointments {
-		// Obtener el slot asociado usando GetSlotByID
 		slot, err := s.Repo.GetSlotByID(appt.SlotID)
 		if err != nil {
 			return &pb.ListAppointmentsResponse{Success: false}, err

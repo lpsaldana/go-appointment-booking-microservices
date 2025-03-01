@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/lpsaldana/go-appointment-booking-microservices/common/pb";
+
+service NotificationService {
+  rpc SendAppointmentNotification (SendAppointmentNotificationRequest) returns (SendAppointmentNotificationResponse) {}
+}
+
+message SendAppointmentNotificationRequest {
+  uint32 client_id = 1;
+  uint32 professional_id = 2;
+  uint32 appointment_id = 3;
+  string start_time = 4;  // ISO 8601 format, ie: "2025-03-10T10:00:00Z"
+  string end_time = 5;    // ISO 8601 format, ie: "2025-03-10T10:30:00Z"
+}
+
+message SendAppointmentNotificationResponse {
+  string message = 1;
+  bool success = 2;
+}

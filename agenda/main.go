@@ -11,6 +11,7 @@ import (
 	"github.com/lpsaldana/go-appointment-booking-microservices/common"
 	"github.com/lpsaldana/go-appointment-booking-microservices/common/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -24,8 +25,14 @@ func main() {
 		log.Fatalf("Cannot connect to DB: %v", err)
 	}
 
+	notifConn, err := grpc.NewClient("localhost:50055", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Cannot connect to notification server: %v", err)
+	}
+	defer notifConn.Close()
+
 	repo := repositories.NewAgendaRepository(db)
-	svc := services.NewAgendaService(repo)
+	svc := services.NewAgendaService(repo, notifConn)
 	handler := handlers.NewAgendaHandler(svc)
 
 	lis, err := net.Listen("tcp", ":50054")
@@ -36,7 +43,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterAgendaServiceServer(grpcServer, handler)
 
-	log.Println("Server runing on port :50055...")
+	log.Println("Server runing on port :50054...")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Error starting gRPC server: %v", err)
 	}

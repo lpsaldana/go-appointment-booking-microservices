@@ -32,5 +32,8 @@ func (r *professionalRepositoryImpl) ListProfessionals() ([]models.Professional,
 func (r *professionalRepositoryImpl) GetProfessionalByID(id uint) (*models.Professional, error) {
 	var professional models.Professional
 	err := r.DB.First(&professional, id).Error
-	return &professional, err
+	if err != nil {
+		return nil, err
+	}
+	return &professional, nil
 }

@@ -28,7 +28,7 @@ func (s *professionalServiceImpl) CreateProfessional(req *pb.CreateProfessionalR
 	}
 	if err := s.Repo.CreateProfessional(professional); err != nil {
 		return &pb.CreateProfessionalResponse{
-			Message: "Error al crear el profesional",
+			Message: "Error creating professional",
 			Success: false,
 		}, err
 	}

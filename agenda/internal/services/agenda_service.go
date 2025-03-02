@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"log"
 	"time"
 
@@ -18,17 +17,17 @@ type AgendaService interface {
 	ListAppointments(req *pb.ListAppointmentsRequest) (*pb.ListAppointmentsResponse, error)
 }
 
-type agendaServiceImpl struct {
+type AgendaServiceImpl struct {
 	Repo        repositories.AgendaRepository
 	NotifClient pb.NotificationServiceClient
 }
 
 func NewAgendaService(repo repositories.AgendaRepository, notifConn *grpc.ClientConn) AgendaService {
-	return &agendaServiceImpl{Repo: repo,
+	return &AgendaServiceImpl{Repo: repo,
 		NotifClient: pb.NewNotificationServiceClient(notifConn)}
 }
 
-func (s *agendaServiceImpl) CreateSlot(req *pb.CreateSlotRequest) (*pb.CreateSlotResponse, error) {
+func (s *AgendaServiceImpl) CreateSlot(req *pb.CreateSlotRequest) (*pb.CreateSlotResponse, error) {
 	startTime, err := time.Parse(time.RFC3339, req.StartTime)
 	if err != nil {
 		return &pb.CreateSlotResponse{Message: "start_time invalid format", Success: false}, err
@@ -55,7 +54,7 @@ func (s *agendaServiceImpl) CreateSlot(req *pb.CreateSlotRequest) (*pb.CreateSlo
 	}, nil
 }
 
-func (s *agendaServiceImpl) ListAvailableSlots(req *pb.ListAvailableSlotsRequest) (*pb.ListAvailableSlotsResponse, error) {
+func (s *AgendaServiceImpl) ListAvailableSlots(req *pb.ListAvailableSlotsRequest) (*pb.ListAvailableSlotsResponse, error) {
 	date, err := time.Parse("2006-01-02", req.Date)
 	if err != nil {
 		return &pb.ListAvailableSlotsResponse{Success: false}, err
@@ -83,7 +82,7 @@ func (s *agendaServiceImpl) ListAvailableSlots(req *pb.ListAvailableSlotsRequest
 	}, nil
 }
 
-func (s *agendaServiceImpl) BookAppointment(req *pb.BookAppointmentRequest) (*pb.BookAppointmentResponse, error) {
+func (s *AgendaServiceImpl) BookAppointment(req *pb.BookAppointmentRequest) (*pb.BookAppointmentResponse, error) {
 	// Verificar si el slot está disponible usando GetSlotByID
 	slot, err := s.Repo.GetSlotByID(uint(req.SlotId))
 	if err != nil {
@@ -107,7 +106,7 @@ func (s *agendaServiceImpl) BookAppointment(req *pb.BookAppointmentRequest) (*pb
 		return &pb.BookAppointmentResponse{Message: "Error updating slot", Success: false}, err
 	}
 
-	_, err = s.NotifClient.SendAppointmentNotification(context.TODO(), &pb.SendAppointmentNotificationRequest{
+	r, err := s.NotifClient.SendAppointmentNotification(nil, &pb.SendAppointmentNotificationRequest{
 		ClientId:       req.ClientId,
 		ProfessionalId: uint32(slot.ProfessionalID),
 		AppointmentId:  uint32(appointment.ID),
@@ -116,6 +115,8 @@ func (s *agendaServiceImpl) BookAppointment(req *pb.BookAppointmentRequest) (*pb
 	})
 	if err != nil {
 		log.Printf("Error sending notification: %v", err)
+	} else {
+		log.Println(r)
 	}
 
 	return &pb.BookAppointmentResponse{
@@ -125,7 +126,7 @@ func (s *agendaServiceImpl) BookAppointment(req *pb.BookAppointmentRequest) (*pb
 	}, nil
 }
 
-func (s *agendaServiceImpl) ListAppointments(req *pb.ListAppointmentsRequest) (*pb.ListAppointmentsResponse, error) {
+func (s *AgendaServiceImpl) ListAppointments(req *pb.ListAppointmentsRequest) (*pb.ListAppointmentsResponse, error) {
 	appointments, err := s.Repo.ListAppointments(uint(req.ClientId), uint(req.ProfessionalId))
 	if err != nil {
 		return &pb.ListAppointmentsResponse{Success: false}, err

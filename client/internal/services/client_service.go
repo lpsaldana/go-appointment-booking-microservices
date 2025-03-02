@@ -28,7 +28,7 @@ func (s *ClientServiceImpl) CreateClient(req *pb.CreateClientRequest) (*pb.Creat
 	}
 	if err := s.Repo.CreateClient(client); err != nil {
 		return &pb.CreateClientResponse{
-			Message: "Error creating cliente",
+			Message: "Error creating client",
 			Success: false,
 		}, err
 	}

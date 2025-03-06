@@ -1,5 +1,3 @@
-No puedo generar un archivo descargable directamente en esta plataforma, pero puedo proporcionarte el contenido del archivo README.md en un formato que puedes copiar y pegar fácilmente en un editor de texto (como VSCode, Notepad, etc.) y luego guardarlo como README.md. Aquí te dejo el contenido completo y listo para usar:
-markdown
 
 # Go Appointment Booking Microservices
 
